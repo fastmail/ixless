@@ -1,5 +1,5 @@
-package Ix::Multicall::Done;
-# ABSTRACT: an L<Ix::Multicall> that requires no action
+package Ixless::Multicall::Done;
+# ABSTRACT: an L<Ixless::Multicall> that requires no action
 
 use Moose;
 
@@ -38,7 +38,7 @@ has result_cid_pairs => (
   required => 1,
 );
 
-with 'Ix::Multicall';
+with 'Ixless::Multicall';
 
 no Moose;
 __PACKAGE__->meta->make_immutable;

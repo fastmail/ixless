@@ -10,7 +10,7 @@ use Bakesale::App;
 use Bakesale::Schema;
 use Test::Deep;
 use Test::More;
-use Ix::Util qw(ix_new_id);
+use Ixless::Util qw(ix_new_id);
 
 my ($app, $jmap_tester) = Bakesale::Test->new_test_app_and_tester;
 

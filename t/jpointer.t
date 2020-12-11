@@ -2,7 +2,7 @@ use v5.14.10;
 use warnings;
 
 use Test::More;
-use Ix::Util;
+use Ixless::Util;
 
 sub true { \1 }
 
@@ -13,7 +13,7 @@ sub resolve_ok {
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   our $Test_Struct;
 
-  my ($struct, $error) = Ix::Util::resolve_modified_jpointer(
+  my ($struct, $error) = Ixless::Util::resolve_modified_jpointer(
     $pointer,
     $Test_Struct,
   );
@@ -29,7 +29,7 @@ sub error_ok {
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   our $Test_Struct;
 
-  my (undef, $error) = Ix::Util::resolve_modified_jpointer(
+  my (undef, $error) = Ixless::Util::resolve_modified_jpointer(
     $pointer,
     $Test_Struct,
   );

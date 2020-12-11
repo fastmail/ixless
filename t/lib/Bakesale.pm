@@ -4,7 +4,7 @@ use experimental qw(lexical_subs signatures postderef);
 
 package Bakesale::Test {
   use File::Temp qw(tempdir);
-  use Ix::Util qw(ix_new_id);
+  use Ixless::Util qw(ix_new_id);
 
   sub new_test_app_and_tester ($self) {
     require JMAP::Tester;
@@ -157,13 +157,13 @@ package Bakesale::Test {
 
 package Bakesale {
   use Moose;
-  with 'Ix::Processor::JMAP';
+  with 'Ixless::Processor::JMAP';
 
   use HTTP::Throwable::JSONFactory qw(http_throw);
 
   use Bakesale::Context;
   use Data::GUID qw(guid_string);
-  use Ix::Validators qw( enum integer record );
+  use Ixless::Validators qw( enum integer record );
 
   use experimental qw(signatures postderef);
   use namespace::autoclean;
@@ -254,7 +254,7 @@ package Bakesale {
     my $s_count = $sc->sentences;
     my $p_count = $sc->paragraphs;
 
-    return Ix::Result::Generic->new({
+    return Ixless::Result::Generic->new({
       result_type       => 'resultCount',
       result_arguments  => { sentences => $s_count, paragraphs => $p_count },
     });
@@ -263,7 +263,7 @@ package Bakesale {
   sub count_chars ($self, $ctx, $arg) {
     my $string = $arg->{string};
     my $length = length $string;
-    return Ix::Result::Generic->new({
+    return Ixless::Result::Generic->new({
       result_type       => 'charCount',
       result_arguments => {
         string => $string,
@@ -297,14 +297,14 @@ package Bakesale {
 
     $argchk->($arg);
 
-    return Ix::Result::Generic->new({
+    return Ixless::Result::Generic->new({
       result_type       => 'argumentsValidated',
       result_arguments  => {},
     });
   }
 
   sub echo ($self, $ctx, $arg) {
-    return Ix::Result::Generic->new({
+    return Ixless::Result::Generic->new({
       result_type       => 'echoEcho',
       result_arguments  => { args => $arg->{echo} },
     });
@@ -382,7 +382,7 @@ package Bakesale {
 
 package Bakesale::PieTypes {
   use Moose;
-  with 'Ix::Result';
+  with 'Ixless::Result';
 
   use experimental qw(signatures postderef);
   use namespace::autoclean;
@@ -408,7 +408,7 @@ package Bakesale::PieTypes {
 package Bakesale::Pie {
   use Moose;
 
-  with 'Ix::Result';
+  with 'Ixless::Result';
 
   use experimental qw(signatures postderef);
   use namespace::autoclean;
@@ -425,7 +425,7 @@ package Bakesale::Pie {
 package Bakesale::Cupcake::Combiner {
   use Moose;
   use experimental qw(lexical_subs signatures postderef);
-  with 'Ix::Multicall';
+  with 'Ixless::Multicall';
 
   sub call_ident { 'Cake/multiset' }
 
@@ -437,7 +437,7 @@ package Bakesale::Cupcake::Combiner {
 
   sub execute ($self, $ctx) {
     return [ [
-      Ix::Result::Generic->new({
+      Ixless::Result::Generic->new({
         result_type => 'Cake/set',
         result_arguments => {
           batchSize => 0+$self->calls->@*,

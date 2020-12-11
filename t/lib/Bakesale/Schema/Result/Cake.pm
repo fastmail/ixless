@@ -4,10 +4,10 @@ use experimental qw(postderef signatures);
 package Bakesale::Schema::Result::Cake;
 use base qw/DBIx::Class::Core/;
 
-use Ix::Validators qw(integer nonemptystr idstr);
+use Ixless::Validators qw(integer nonemptystr idstr);
 use List::Util qw(max);
 
-__PACKAGE__->load_components(qw/+Ix::DBIC::Result/);
+__PACKAGE__->load_components(qw/+Ixless::DBIC::Result/);
 
 __PACKAGE__->table('cakes');
 
@@ -40,7 +40,7 @@ sub ix_type_key { 'Cake' }
 sub ix_account_type { 'generic' }
 
 sub ix_default_properties {
-  return { baked_at => Ix::DateTime->now };
+  return { baked_at => Ixless::DateTime->now };
 }
 
 sub ix_get_check ($self, $ctx, $arg) {
@@ -60,7 +60,7 @@ sub ix_state_string ($self, $state) {
 sub ix_compare_state ($self, $since, $state) {
   my ($cake_since, $recipe_since) = split /-/, $since, 2;
 
-  return Ix::StateComparison->bogus
+  return Ixless::StateComparison->bogus
     unless ($cake_since//'')    =~ /\A[0-9]+\z/
         && ($recipe_since//'')  =~ /\A[0-9]+\z/;
 
@@ -71,18 +71,18 @@ sub ix_compare_state ($self, $since, $state) {
   my $recipe_low  = $state->lowest_modseq_for('CakeRecipe');
 
   if ($cake_high < $cake_since || $recipe_high < $recipe_since) {
-    return Ix::StateComparison->bogus;
+    return Ixless::StateComparison->bogus;
   }
 
   if ($cake_low > $cake_since || $recipe_low > $recipe_since) {
-    return Ix::StateComparison->resync;
+    return Ixless::StateComparison->resync;
   }
 
   if ($cake_high == $cake_since && $recipe_high == $recipe_since) {
-    return Ix::StateComparison->in_sync;
+    return Ixless::StateComparison->in_sync;
   }
 
-  return Ix::StateComparison->okay;
+  return Ixless::StateComparison->okay;
 }
 
 sub ix_update_state_string_field { 'jointModSeq' }
@@ -294,7 +294,7 @@ sub ix_published_method_map {
 }
 
 sub are_cakes_delicious ($self, $ctx, $arg) {
-  return Ix::Result::Generic->new({
+  return Ixless::Result::Generic->new({
     result_type       => 'cakesAreDelicious',
     result_arguments  => { howDelicious => 'very' },
   });

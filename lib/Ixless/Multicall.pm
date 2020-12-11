@@ -1,4 +1,4 @@
-package Ix::Multicall;
+package Ixless::Multicall;
 # ABSTRACT: an abstraction representing a collection of calls
 
 use Moose::Role;
@@ -6,7 +6,7 @@ use Moose::Role;
 =head1 OVERVIEW
 
 This is a Moose role representing a combination of calls which is actually
-performed as a single call. This allows an Ix::App to optimize client calls
+performed as a single call. This allows an Ixless::App to optimize client calls
 if desired.
 
 =method execute

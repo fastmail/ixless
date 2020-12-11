@@ -432,7 +432,7 @@ subtest "invalid sinceState" => sub {
   # Make sure object detection works
   my $past = DateTime->now->subtract(years => 5);
   my $ixdt = $past->clone;
-  bless $ixdt, 'Ix::DateTime';
+  bless $ixdt, 'Ixless::DateTime';
   my $past_str = $ixdt->as_string;
 
   my $bad = bless {}, 'Brownie';

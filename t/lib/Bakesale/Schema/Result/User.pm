@@ -4,9 +4,9 @@ use experimental qw(postderef signatures);
 package Bakesale::Schema::Result::User;
 use base qw/DBIx::Class::Core/;
 
-use Ix::Validators qw(enum);
+use Ixless::Validators qw(enum);
 
-__PACKAGE__->load_components(qw/+Ix::DBIC::Result/);
+__PACKAGE__->load_components(qw/+Ixless::DBIC::Result/);
 
 __PACKAGE__->table('users');
 
@@ -95,7 +95,7 @@ sub ix_update_error ($self, $ctx, $error, $args) {
         username => 'nobody',
       });
 
-      return $Ix::DBIC::ResultSet::SKIPPED;
+      return $Ixless::DBIC::ResultSet::SKIPPED;
     } elsif ($row->username eq 'kaboom') {
       # Let Ix handle this duplicate key error
       return ();

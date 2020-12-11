@@ -1,6 +1,6 @@
 use 5.20.0;
-package Ix::App::JMAP;
-# ABSTRACT: an Ix::App for JMAP processors
+package Ixless::App::JMAP;
+# ABSTRACT: an Ixless::App for JMAP processors
 
 use Moose::Role;
 use experimental qw(signatures postderef);
@@ -10,13 +10,13 @@ use Try::Tiny;
 
 use namespace::autoclean;
 
-with 'Ix::App';
+with 'Ixless::App';
 
 =head1 OVERVIEW
 
-This is a Moose::Role which is just an L<Ix::App> whose C<_core_request>
+This is a Moose::Role which is just an L<Ixless::App> whose C<_core_request>
 method is designed for JMAP. It only accepts JSON requests, passes them into
-C<handle_calls> on an C<Ix::Context> object, then encodes the JSON on the way
+C<handle_calls> on an C<Ixless::Context> object, then encodes the JSON on the way
 out. Easy peasy.
 
 =cut

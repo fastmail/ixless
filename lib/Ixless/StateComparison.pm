@@ -1,6 +1,6 @@
 use 5.20.0;
 use warnings;
-package Ix::StateComparison;
+package Ixless::StateComparison;
 # ABSTRACT: a tiny class for comparing states
 
 use experimental qw(signatures postderef);
@@ -22,7 +22,7 @@ __END__
 =head1 SYNOPSIS
 
 This class represents the thing you get back from  C<ix_compare_state> in
-L<Ix::DBIC::Result>.
+L<Ixless::DBIC::Result>.
 
     my $cmp = $rclass->ix_compare_state($old_state, $new_state);
 
@@ -53,7 +53,7 @@ implement your own C<ix_compare_state> method), use the following class
 methods:
 
 =for :list
-* Ix::StateComparison->in_sync
-* Ix::StateComparison->bogus
-* Ix::StateComparison->resync
-* Ix::StateComparison->okay
+* Ixless::StateComparison->in_sync
+* Ixless::StateComparison->bogus
+* Ixless::StateComparison->resync
+* Ixless::StateComparison->okay

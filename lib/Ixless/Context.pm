@@ -1,20 +1,20 @@
 use 5.20.0;
-package Ix::Context;
+package Ixless::Context;
 # ABSTRACT: access information from a bunch of places
 #           Where did you come from, where did you go?
 
 use Moose::Role;
 use experimental qw(signatures postderef);
 
-use Ix::Error;
-use Ix::Result;
+use Ixless::Error;
+use Ixless::Result;
 use Safe::Isa;
 
 use namespace::autoclean;
 
 =head1 OVERVIEW
 
-An object that does C<Ix::Context> is passed as an argument to nearly every Ix
+An object that does C<Ixless::Context> is passed as an argument to nearly every Ix
 method.  It contains, well, I<context> for a given request, as well as
 accessors to a bunch of things you might need in all sorts of places: the
 schema, methods for reporting errors, information about the results so far,
@@ -57,7 +57,7 @@ sub root_context ($self) { $self }
 
 =attr schema
 
-A handle to an C<Ix::DBIC::Schema> object. This is the normal way of accessing
+A handle to an C<Ixless::DBIC::Schema> object. This is the normal way of accessing
 the database from inside your application.
 
 =method global_rs
@@ -76,13 +76,13 @@ has schema => (
 
 =attr processor
 
-An C<Ix::Processor> that's used to C<handle_calls> made on this context.
+An C<Ixless::Processor> that's used to C<handle_calls> made on this context.
 
 =cut
 
 has processor => (
   is   => 'ro',
-  does => 'Ix::Processor',
+  does => 'Ixless::Processor',
   required => 1,
 );
 
@@ -165,7 +165,7 @@ has result_accumulator => (
 =method results_so_far
 
 This is used during a single request to access the
-L<Ix::JMAP::SentenceCollection> that's accumulating the results.
+L<Ixless::JMAP::SentenceCollection> that's accumulating the results.
 
 =cut
 
@@ -179,7 +179,7 @@ sub results_so_far ($self) {
 =method handle_calls($calls, $arg)
 
 A wrapper around the processor's C<handle_calls>. Returns an
-L<Ix::JMAP::SentenceCollection>.
+L<Ixless::JMAP::SentenceCollection>.
 
 =cut
 
@@ -227,9 +227,9 @@ logs the exception's GUID.
 =cut
 
 sub report_exception ($ctx, $exception) {
-  # Ix::Error::Internals are created after we've already reported an
+  # Ixless::Error::Internals are created after we've already reported an
   # exception, so don't throw them again
-  return $exception->report_guid if $exception->$_isa('Ix::Error::Internal');
+  return $exception->report_guid if $exception->$_isa('Ixless::Error::Internal');
 
   my $guid = $ctx->processor->file_exception_report($ctx, $exception);
   $ctx->log_exception_guid($guid);
@@ -238,7 +238,7 @@ sub report_exception ($ctx, $exception) {
 
 =method error($ctx, $type, $prop = {}, $ident = undef, $payload = undef)
 
-A convenience method for generating an L<Ix::Error::Generic> object. If you
+A convenience method for generating an L<Ixless::Error::Generic> object. If you
 pass C<$ident>, this method also wraps it in an ExceptionWrapper and calls
 C<report_exception>.
 
@@ -247,7 +247,7 @@ C<report_exception>.
 sub error ($ctx, $type, $prop = {}, $ident = undef, $payload = undef) {
   my $report_guid;
   if (defined $ident) {
-    my $report = Ix::ExceptionWrapper->new({
+    my $report = Ixless::ExceptionWrapper->new({
       ident => $ident,
       ($payload ? (payload => $payload) : ()),
     });
@@ -255,7 +255,7 @@ sub error ($ctx, $type, $prop = {}, $ident = undef, $payload = undef) {
     $report_guid = $ctx->report_exception($report);
   }
 
-  Ix::Error::Generic->new({
+  Ixless::Error::Generic->new({
     error_type => $type,
     properties => $prop,
     ($report_guid ? (report_guid => $report_guid) : ()),
@@ -265,19 +265,19 @@ sub error ($ctx, $type, $prop = {}, $ident = undef, $payload = undef) {
 =method internal_error($ident, $payload = undef)
 
 Just like C<error>, but C<$ident> is required, and instead generates an
-L<Ix::Error::Internal>.
+L<Ixless::Error::Internal>.
 
 =cut
 
 sub internal_error ($ctx, $ident, $payload = undef) {
-  my $report = Ix::ExceptionWrapper->new({
+  my $report = Ixless::ExceptionWrapper->new({
     ident => $ident,
     ($payload ? (payload => $payload) : ()),
   });
 
   my $report_guid = $ctx->report_exception($report);
 
-  Ix::Error::Internal->new({
+  Ixless::Error::Internal->new({
     error_ident => $ident,
     report_guid => $report_guid,
   });
@@ -285,12 +285,12 @@ sub internal_error ($ctx, $ident, $payload = undef) {
 
 =method result($type, $properties = {})
 
-A convenience method for generating an L<Ix::Result::Generic>.
+A convenience method for generating an L<Ixless::Result::Generic>.
 
 =cut
 
 sub result ($ctx, $type, $prop = {}) {
-  Ix::Result::Generic->new({
+  Ixless::Result::Generic->new({
     result_type       => $type,
     result_arguments => $prop,
   });

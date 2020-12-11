@@ -20,7 +20,7 @@ has transaction_log => (
   },
 );
 
-with 'Ix::App::JMAP';
+with 'Ixless::App::JMAP';
 
 has '+processor' => (default => sub { Bakesale->new });
 

@@ -1,6 +1,6 @@
 use 5.20.0;
 use warnings;
-package Ix::DBIC::StatesResult;
+package Ixless::DBIC::StatesResult;
 # ABSTRACT: the DBIC result for your states
 
 use parent 'DBIx::Class';
@@ -15,7 +15,7 @@ Probably you can just copy and paste this exactly.
     package MyApp::Schema::Result::State;
     use base qw/DBIx::Class::Core/;
 
-    __PACKAGE__->load_components(qw/+Ix::DBIC::StatesResult/);
+    __PACKAGE__->load_components(qw/+Ixless::DBIC::StatesResult/);
     __PACKAGE__->table('states');
     __PACKAGE__->ix_setup_states_result;
 

@@ -4,10 +4,10 @@ use experimental qw(postderef signatures);
 package Bakesale::Schema::Result::CakeTopper;
 use base qw/DBIx::Class::Core/;
 
-use Ix::Validators qw(integer nonemptystr idstr);
+use Ixless::Validators qw(integer nonemptystr idstr);
 use List::Util qw(max);
 
-__PACKAGE__->load_components(qw/+Ix::DBIC::Result/);
+__PACKAGE__->load_components(qw/+Ixless::DBIC::Result/);
 
 __PACKAGE__->table('cake_toppers');
 

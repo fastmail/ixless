@@ -9,7 +9,7 @@ eval <<'EOF';
   package Thing;
   use base qw/DBIx::Class::Core/;
 
-  __PACKAGE__->load_components(qw/+Ix::DBIC::Result/);
+  __PACKAGE__->load_components(qw/+Ixless::DBIC::Result/);
 
   __PACKAGE__->table('things');
 

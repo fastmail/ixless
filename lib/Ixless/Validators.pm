@@ -1,12 +1,12 @@
 use 5.22.0;
 use warnings;
-package Ix::Validators;
+package Ixless::Validators;
 # ABSTRACT: validate your input
 
 use JSON::MaybeXS ();
 use Params::Util qw(_ARRAY0);
 use Safe::Isa;
-use Ix::Util qw($ix_id_re);
+use Ixless::Util qw($ix_id_re);
 
 use experimental qw(lexical_subs postderef signatures);
 
@@ -25,7 +25,7 @@ use Sub::Exporter -setup => [ qw(
 
 =head1 SYNOPSIS
 
-    use Ix::Validators qw(string email integer);
+    use Ixless::Validators qw(string email integer);
 
     if (my $err = string({ nonempty => 1 })->('')) {
       die "Your string is bad: $err";
@@ -176,7 +176,7 @@ The same kind of structure as C<required>, but these are, well, optional.
 = throw
 
 If false, errors are simply returned from the validator; if true, errors are wrapped in
-L<Ix::Error::Generic> objects and thrown as exceptions.
+L<Ixless::Error::Generic> objects and thrown as exceptions.
 
 =end :list
 
@@ -245,8 +245,8 @@ sub record ($arg) {
 
     return \%error unless $throw;
 
-    require Ix::Result;
-    Ix::Error::Generic->new({
+    require Ixless::Result;
+    Ixless::Error::Generic->new({
       error_type => 'invalidArguments',
       properties => { invalidArguments => \%error },
     })->throw;

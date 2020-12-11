@@ -4,11 +4,11 @@ use experimental qw(postderef signatures);
 package Bakesale::Schema::Result::Cookie;
 use base qw/DBIx::Class::Core/;
 use DateTime;
-use Ix::Validators qw(idstr);
-use Ix::Util qw(differ);
+use Ixless::Validators qw(idstr);
+use Ixless::Util qw(differ);
 use List::Util qw(first);
 
-__PACKAGE__->load_components(qw/+Ix::DBIC::Result/);
+__PACKAGE__->load_components(qw/+Ixless::DBIC::Result/);
 
 __PACKAGE__->table('cookies');
 
@@ -39,8 +39,8 @@ sub ix_postprocess_set { $next_batch++ }
 
 sub ix_default_properties {
   return {
-    baked_at   => Ix::DateTime->now,
-    expires_at => Ix::DateTime->now->add(days => 3),
+    baked_at   => Ixless::DateTime->now,
+    expires_at => Ixless::DateTime->now->add(days => 3),
     delicious  => 'yes',
     batch      => sub { $next_batch }
   };

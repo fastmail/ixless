@@ -1,14 +1,14 @@
 use 5.20.0;
-package Ix::Context::WithAccount;
-# ABSTRACT: an Ix::Context, bound to a single account
+package Ixless::Context::WithAccount;
+# ABSTRACT: an Ixless::Context, bound to a single account
 
 use Moose::Role;
 use experimental qw(signatures postderef);
 
-use Ix::Error;
-use Ix::Result;
+use Ixless::Error;
+use Ixless::Result;
 
-use Ix::AccountState;
+use Ixless::AccountState;
 
 use Try::Tiny;
 
@@ -16,10 +16,10 @@ use namespace::autoclean;
 
 =head1 OVERVIEW
 
-This is a Moose role representing an L<Ix::Context> object that's bound to a
+This is a Moose role representing an L<Ixless::Context> object that's bound to a
 single account. Most operations in Ix are done on a single account, and thus
 done with a C<WithAccount> context object. When a request comes in to an
-C<Ix::App>, we build a context for a given accountId, and then all of the
+C<Ixless::App>, we build a context for a given accountId, and then all of the
 methods are bound to that context. In addition to access control, a
 WithAccount context handles record-keeping of modseqs and state strings for an
 account.
@@ -41,7 +41,7 @@ requires 'accountId';
 
 has root_context => (
   is     => 'ro',
-  does   => 'Ix::Context',
+  does   => 'Ixless::Context',
   required => 1,
   handles  => [ qw(
     schema
@@ -75,20 +75,20 @@ has _txn_level => (
 
 =attr state
 
-An L<Ix::AccountState> object.
+An L<Ixless::AccountState> object.
 
 =cut
 
 has state => (
   is => 'rw',
-  isa => 'Ix::AccountState',
+  isa => 'Ixless::AccountState',
   lazy => 1,
   builder => '_build_state',
   predicate => '_has_state',
 );
 
 sub _build_state ($self) {
-  Ix::AccountState->new({
+  Ixless::AccountState->new({
     context      => $self,
     account_type => $self->account_type,
     accountId    => $self->accountId,
@@ -187,7 +187,7 @@ sub process_request ($self, $calls) {
 
 Just like C<< $self->schema->resultset($rs_name) >>, but ensures that the
 resultset only contains active rows matching our accountId. See also
-L<Ix::DBIC::AccountResult>.
+L<Ixless::DBIC::AccountResult>.
 
 =cut
 
@@ -196,7 +196,7 @@ sub account_rs ($self, $rs_name) {
     'me.accountId' => $self->accountId,
   });
 
-  if ($rs->result_class->isa('Ix::DBIC::Result')) {
+  if ($rs->result_class->isa('Ixless::DBIC::Result')) {
     $rs = $rs->search({ 'me.isActive' => 1 });
   }
 
@@ -206,7 +206,7 @@ sub account_rs ($self, $rs_name) {
 =method account_rs_including_inactive($rs_name)
 
 Just like C<account_rs>, but without the C<isActive> constraint.  See also
-L<Ix::DBIC::AccountResult>.
+L<Ixless::DBIC::AccountResult>.
 
 =cut
 
@@ -237,7 +237,7 @@ sub with_account ($self, $account_type, $accountId) {
 
 =method result($type, $properties = {})
 
-A convenience method for generating an L<Ix::Result::Generic>. If
+A convenience method for generating an L<Ixless::Result::Generic>. If
 C<$properties> contains an C<accountId> that does not match our own, generates
 an internal error. All results will include our accountId.
 

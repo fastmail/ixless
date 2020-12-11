@@ -1,6 +1,6 @@
 use 5.20.0;
 use warnings;
-package Ix::DBIC::Schema;
+package Ixless::DBIC::Schema;
 # ABSTRACT: a DBIx::Class schema extension for Ix
 
 use parent 'DBIx::Class';
@@ -15,10 +15,10 @@ them. Use it like this:
     package MyApp::Schema;
     use base qw/DBIx::Class::Schema/;
 
-    __PACKAGE__->load_components(qw/+Ix::DBIC::Schema/);
+    __PACKAGE__->load_components(qw/+Ixless::DBIC::Schema/);
 
     __PACKAGE__->load_namespaces(
-      default_resultset_class => '+Ix::DBIC::ResultSet',
+      default_resultset_class => '+Ixless::DBIC::ResultSet',
     );
 
     __PACKAGE__->ix_finalize;
@@ -88,11 +88,11 @@ sub deploy {
 =method global_rs_including_inactive($rs_name)
 
 These methods are the counterparts to C<account_rs> and
-C<account_rs_including_inactive> from L<Ix::DBIC::AccountResult>. They are
+C<account_rs_including_inactive> from L<Ixless::DBIC::AccountResult>. They are
 wrappers around C<< $schema->resultset($rs_name) >>, but do not include any
 accountId by default.
 
-They are most often called via an L<Ix::Context> object: using these methods
+They are most often called via an L<Ixless::Context> object: using these methods
 makes it very obvious when you intend to search the database L<across>
 accounts: C<< $ctx->global_rs('Foo') >> and C<< $ctx->account_rs('Foo') >>
 makes clear which is which and helps to prevent silly bugs that can occur if
@@ -103,7 +103,7 @@ you just use C<resultset> directly.
 sub global_rs ($self, $rs_name) {
   my $rs = $self->resultset($rs_name);
 
-  if ($rs->result_class->isa('Ix::DBIC::Result')) {
+  if ($rs->result_class->isa('Ixless::DBIC::Result')) {
     $rs = $rs->search({ 'me.isActive' => 1 });
   }
 

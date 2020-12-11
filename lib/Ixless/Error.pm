@@ -1,23 +1,23 @@
 use 5.20.0;
-package Ix::Error;
-# ABSTRACT: a throwable, failed Ix::Result
+package Ixless::Error;
+# ABSTRACT: a throwable, failed Ixless::Result
 
 use Moose::Role;
 use experimental qw(signatures postderef);
 
-with 'Ix::Result', 'Throwable';
+with 'Ixless::Result', 'Throwable';
 
 use namespace::autoclean;
 
 =head1 OVERVIEW
 
-This is a Moose role that represents a failed L<Ix::Result>, with a result
+This is a Moose role that represents a failed L<Ixless::Result>, with a result
 type C<error>. Implementations are required to implement C<error_type>. This
 package include two implementations.
 
-=head2 Ix::Error::Internal
+=head2 Ixless::Error::Internal
 
-This kind of error is thrown by C<Ix::App> when it catches an exception.  It's
+This kind of error is thrown by C<Ixless::App> when it catches an exception.  It's
 designed so that it shows no useful information to the client: if an internal
 error has happened, there's no telling what might be in C<$@>, so we don't
 want to pass that on. Instead, we return a JMAP error with type
@@ -25,7 +25,7 @@ C<internalError> and a C<guid>, so that you can look up the report that's been
 filed out-of-band.  An internal error object has two other useful methods on it:
 C<error_ident> and C<report_guid>.
 
-=head2 Ix::Error::Generic
+=head2 Ixless::Error::Generic
 
 This is an error that's suitable to throw for run-of-the mill JMAP errors
 (invalidArguments, unknownMethod, etc.). They have a few useful methods:
@@ -38,7 +38,7 @@ sub result_type { 'error' }
 requires 'error_type';
 
 package
-  Ix::ExceptionWrapper {
+  Ixless::ExceptionWrapper {
 
   use Moose;
   use MooseX::StrictConstructor;
@@ -59,7 +59,7 @@ package
   __PACKAGE__->meta->make_immutable;
 }
 
-package Ix::Error::Internal {
+package Ixless::Error::Internal {
 
   use Moose;
   use MooseX::StrictConstructor;
@@ -69,7 +69,7 @@ package Ix::Error::Internal {
 
   use overload
     '""' => sub {
-      return sprintf "Ix::Error::Internal(%s %s)",
+      return sprintf "Ixless::Error::Internal(%s %s)",
         $_[0]->error_ident,
         $_[0]->report_guid;
     },
@@ -93,12 +93,12 @@ package Ix::Error::Internal {
     return { type => 'internalError', guid => $self->report_guid };
   }
 
-  with 'Ix::Error';
+  with 'Ixless::Error';
 
   __PACKAGE__->meta->make_immutable;
 }
 
-package Ix::Error::Generic {
+package Ixless::Error::Generic {
 
   use Moose;
   use MooseX::StrictConstructor;
@@ -109,12 +109,12 @@ package Ix::Error::Generic {
   use overload
     '""' => sub {
       if ($_[0]->has_report_guid) {
-        return sprintf "Ix::Error::Generic(%s %s)",
+        return sprintf "Ixless::Error::Generic(%s %s)",
           $_[0]->error_type,
           $_[0]->report_guid;
       }
 
-      return sprintf "Ix::Error::Generic(%s)", $_[0]->error_type;
+      return sprintf "Ixless::Error::Generic(%s)", $_[0]->error_type;
     },
     fallback => 1;
 
@@ -147,7 +147,7 @@ package Ix::Error::Generic {
     required => 1,
   );
 
-  with 'Ix::Error';
+  with 'Ixless::Error';
 
   __PACKAGE__->meta->make_immutable;
 }

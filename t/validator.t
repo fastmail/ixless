@@ -7,9 +7,9 @@ BEGIN { binmode $_, ':encoding(UTF-8)' for *STDOUT, *STDERR };
 
 use lib 't/lib';
 
-use Ix::Validators qw(domain email idstr string);
+use Ixless::Validators qw(domain email idstr string);
 use Test::More;
-use Ix::Util qw(ix_new_id);
+use Ixless::Util qw(ix_new_id);
 
 my $iderr = idstr();
 for my $input (ix_new_id(), ix_new_id()) {

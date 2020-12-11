@@ -1,6 +1,6 @@
 use 5.20.0;
 use warnings;
-package Ix::DBIC::AccountResult;
+package Ixless::DBIC::AccountResult;
 # ABSTRACT: easily get resultsets bound to an accountId
 
 use parent 'DBIx::Class';
@@ -11,14 +11,14 @@ use experimental qw(signatures postderef);
 
 We wrote this component after forgetting one too many times to include
 C<accountId> and C<isActive> in a DBIC search, which led to one very visible
-bug. Mostly these methods are called via an L<Ix::Context::WithAccount>
+bug. Mostly these methods are called via an L<Ixless::Context::WithAccount>
 object, and you should probably only use this component directly if you are
-writing an accountId-bound component that does I<not> use L<Ix::DBIC::Result>,
+writing an accountId-bound component that does I<not> use L<Ixless::DBIC::Result>,
 for some reason.
 
 This component provides two methods, C<account_rs> and
 C<account_rs_including_inactive>, which automatically add C<< $self->accountId >>.
-If the resultset is an L<Ix::DBIC::Result>, the first also adds
+If the resultset is an L<Ixless::DBIC::Result>, the first also adds
 C<< isActive => 1 >>.
 
 =method account_rs($rs_name)
@@ -33,7 +33,7 @@ sub account_rs ($self, $rs_name) {
     'me.accountId' => $self->accountId,
   });
 
-  if ($rs->result_class->isa('Ix::DBIC::Result')) {
+  if ($rs->result_class->isa('Ixless::DBIC::Result')) {
     $rs = $rs->search({ 'me.isActive' => 1 });
   }
 

@@ -1,6 +1,6 @@
 use 5.20.0;
 use warnings;
-package Ix::AccountState;
+package Ixless::AccountState;
 # ABSTRACT: bookkeeping for JMAP state strings
 
 use Moose;
@@ -12,10 +12,10 @@ use namespace::clean;
 =head1 OVERVIEW
 
 This class is responsible for keeping track of JMAP state strings for an
-account. Every L<Ix::DBIC::Result> row has associated accountId,
+account. Every L<Ixless::DBIC::Result> row has associated accountId,
 modSeqCreated, and modSeqChanged columns. The state strings for these object
 types are tracked in a separate table, which is represented by an
-L<Ix::DBIC::StatesResult> rclass.
+L<Ixless::DBIC::StatesResult> rclass.
 
 When modifying a result row, the context object calls out to an AccountState
 object to fill in modSeqCreated or modSeqChanged attributes, and to ensure
@@ -103,7 +103,7 @@ sub highest_modseq_for ($self, $type) {
 
 =method ensure_state_bumped($type)
 
-This is called internally by L<Ix::DBIC::ResultSet> to bump the state for a
+This is called internally by L<Ixless::DBIC::ResultSet> to bump the state for a
 given type. Internally, this keeps track of pending states and ensures that
 the state is only bumped once per transaction.
 
@@ -117,7 +117,7 @@ sub ensure_state_bumped ($self, $type) {
 
 =method next_state_for($type)
 
-This is used by L<Ix::DBIC::ResultSet> to fill in modSeqCreated or
+This is used by L<Ixless::DBIC::ResultSet> to fill in modSeqCreated or
 modSeqChanged values on result rows. It returns the current state + 1 if no
 changes are pending, and the pending state if one exists.
 

@@ -1,5 +1,5 @@
 use 5.20.0;
-package Ix::Util;
+package Ixless::Util;
 # ABSTRACT: utility methods for all your Ix needs
 
 use experimental qw(signatures postderef);
@@ -23,13 +23,13 @@ use Sub::Exporter -setup => {
 =head1 OVERVIEW
 
 This module exports (via L<Sub::Exporter>) a bunch of utility methods. More
-interestingly, it also includes C<Ix::DateTime>.
+interestingly, it also includes C<Ixless::DateTime>.
 
-=head2 Ix::DateTime
+=head2 Ixless::DateTime
 
-Ix::DateTime is a subclass of L<DateTime> that makes generating JMAP-style
+Ixless::DateTime is a subclass of L<DateTime> that makes generating JMAP-style
 (RFC 3339) dates easier. It includes a C<to_string> method and overloads
-stringification (and C<TO_JSON>) so that you can just include Ix::DateTime
+stringification (and C<TO_JSON>) so that you can just include Ixless::DateTime
 objects in places where you need date-time strings without thinking too hard.
 
 =cut
@@ -61,7 +61,7 @@ sub ix_new_id { lc guid_string() }
 
 =func parsepgdate($str)
 
-Given a datetime string from Postgres, returns an C<Ix::DateTime> object. This
+Given a datetime string from Postgres, returns an C<Ixless::DateTime> object. This
 is parsed with C<DateTime::Format::Pg>.
 
 =cut
@@ -70,12 +70,12 @@ sub parsepgdate ($str) {
   my $dt;
   return unless eval { $dt = $pg->parse_datetime($str) };
 
-  bless $dt, 'Ix::DateTime';
+  bless $dt, 'Ixless::DateTime';
 }
 
 =func parsepgdate($str)
 
-Given a JMAP date (like "2017-09-12T12:34:56Z"), returns an C<Ix::DateTime>
+Given a JMAP date (like "2017-09-12T12:34:56Z"), returns an C<Ixless::DateTime>
 object. This is parsed with L<DateTime::Format::RFC3339>, but the time must be
 in Zulu time with no fractional seconds.
 
@@ -88,7 +88,7 @@ sub parsedate ($str) {
   my $dt;
   return unless eval { $dt = $rfc3339->parse_datetime($str) };
 
-  bless $dt, 'Ix::DateTime';
+  bless $dt, 'Ixless::DateTime';
 }
 
 =func differ($x, $y)
@@ -112,7 +112,7 @@ sub differ ($x, $y) {
   return 1 if defined $x xor defined $y;
   return unless defined $x;
 
-  if ($x->$_isa('Ix::DateTime') || $y->$_isa('Ix::DateTime')) {
+  if ($x->$_isa('Ixless::DateTime') || $y->$_isa('Ixless::DateTime')) {
     return $x ne $y;
   }
 
@@ -278,7 +278,7 @@ sub _descend_modified_jpointer {
 
 1;
 
-package Ix::DateTime {
+package Ixless::DateTime {
 
   use parent 'DateTime'; # should use DateTime::Moonpig
 

@@ -1,5 +1,5 @@
 use 5.20.0;
-package Ix::Result;
+package Ixless::Result;
 # ABSTRACT: a role representing a JMAP response
 
 use Moose::Role;
@@ -9,7 +9,7 @@ use namespace::autoclean;
 
 =head1 SYNOPSIS
 
-An Ix::Result is a role to represent JMAP responses. It requires two methods:
+An Ixless::Result is a role to represent JMAP responses. It requires two methods:
 
 =begin :list
 
@@ -31,13 +31,13 @@ There are two implementations of this role provided here.
 requires 'result_type';
 requires 'result_arguments';
 
-=head2 Ix::Result::Generic
+=head2 Ixless::Result::Generic
 
 The most basic implementation you could imagine.
 
 =cut
 
-package Ix::Result::Generic {
+package Ixless::Result::Generic {
 
   use Moose;
   use MooseX::StrictConstructor;
@@ -52,10 +52,10 @@ package Ix::Result::Generic {
     required => 1,
   );
 
-  with 'Ix::Result';
+  with 'Ixless::Result';
 };
 
-=head2 Ix::Result::FoosSet
+=head2 Ixless::Result::FoosSet
 
 This represents a Foo/set method response. It has a few additional accessor
 methods:
@@ -73,7 +73,7 @@ methods:
 
 =cut
 
-package Ix::Result::FoosSet {
+package Ixless::Result::FoosSet {
 # ABSTRACT: a result representing a Foo/set method response.
 
   use Moose;
@@ -126,7 +126,7 @@ package Ix::Result::FoosSet {
   has not_updated => (is => 'ro');
   has not_destroyed => (is => 'ro');
 
-  with 'Ix::Result';
+  with 'Ixless::Result';
 };
 
 1;

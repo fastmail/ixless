@@ -5,7 +5,7 @@ use experimental qw(lexical_subs signatures postderef);
 
 use Test::More;
 
-use Ix::Util qw(splitquoted);
+use Ixless::Util qw(splitquoted);
 
 {
   my $input = q{"foo \" bar" baz 'bingo' 'bi"n\g' "boo};

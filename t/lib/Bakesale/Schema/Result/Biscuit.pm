@@ -4,11 +4,11 @@ use experimental qw(postderef signatures);
 package Bakesale::Schema::Result::Biscuit;
 use base qw/DBIx::Class::Core/;
 use DateTime;
-use Ix::Validators qw(idstr);
-use Ix::Util qw(differ);
+use Ixless::Validators qw(idstr);
+use Ixless::Util qw(differ);
 use List::Util qw(first);
 
-__PACKAGE__->load_components(qw/+Ix::DBIC::Result/);
+__PACKAGE__->load_components(qw/+Ixless::DBIC::Result/);
 
 __PACKAGE__->table('biscuits');
 

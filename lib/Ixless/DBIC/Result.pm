@@ -1,15 +1,15 @@
 use 5.20.0;
 use warnings;
-package Ix::DBIC::Result;
+package Ixless::DBIC::Result;
 # ABSTRACT: a DBIC result class with JMAP smarts
 
 use parent 'DBIx::Class';
 
 use experimental qw(signatures postderef);
 
-use Ix::StateComparison;
-use Ix::Validators;
-use Ix::Util qw(ix_new_id);
+use Ixless::StateComparison;
+use Ixless::Validators;
+use Ixless::Util qw(ix_new_id);
 use JSON::MaybeXS;
 
 =head1 SYNOPSIS
@@ -17,7 +17,7 @@ use JSON::MaybeXS;
     package MyApp::Schema::Result::Cookie;
     use base qw/DBIx::Class::Core/;
 
-    __PACKAGE__->load_components(qw/+Ix::DBIC::Result/);
+    __PACKAGE__->load_components(qw/+Ixless::DBIC::Result/);
 
     __PACKAGE__->table('cookies');
 
@@ -41,17 +41,17 @@ use JSON::MaybeXS;
 This class is where Ix gets most of its smarts. In your application, you define
 C<DBIx::Class> result classes (here, rclasses) and load this class as a
 component. Doing so gives you many extra behaviors, and allows you to hook into
-various points of the operations done by L<Ix::DBIC::ResultSet> in its
+various points of the operations done by L<Ixless::DBIC::ResultSet> in its
 implementations of the core JMAP methods.
 
 =cut
 
-__PACKAGE__->load_components(qw/+Ix::DBIC::AccountResult/);
+__PACKAGE__->load_components(qw/+Ixless::DBIC::AccountResult/);
 
 =method ix_account_type
 
 You B<must> define this method in your rclass. This is the account type that's
-passed to C<with_account> in L<Ix::Context>.
+passed to C<with_account> in L<Ixless::Context>.
 
 (In theory, an Ix application can have multiple account types, but in practice,
 we have only ever used a single one.)
@@ -260,7 +260,7 @@ we can generate JMAP handlers with these properties later.
 An example will be useful:
 
     package MyApp::Schema::Result::Cookie;
-    use Ix::Validators qw(integer);
+    use Ixless::Validators qw(integer);
 
     __PACKAGE__->ix_add_properties(
       batch       => { data_type => 'integer', client_may_init => 0, client_may_update => 0 },
@@ -280,7 +280,7 @@ This code adds four properties to our rclass:
 4. batch_size - an optional integer, which must be between 0 and 100.
 
 C<data_type> defines the type of the column, and also provides automatic
-validation with L<Ix::Validator>. They're shown here with their corresponding
+validation with L<Ixless::Validator>. They're shown here with their corresponding
 Postgres types and which validator they use:
 
 =for :list
@@ -379,11 +379,11 @@ sub ix_add_properties ($class, @pairs) {
 }
 
 my %DEFAULT_VALIDATOR = (
-  integer => Ix::Validators::integer(),
-  string  => Ix::Validators::string({ oneline => 1 }),
-  istring => Ix::Validators::string({ oneline => 1 }),
-  boolean => Ix::Validators::boolean(),
-  idstr   => Ix::Validators::idstr(),
+  integer => Ixless::Validators::integer(),
+  string  => Ixless::Validators::string({ oneline => 1 }),
+  istring => Ixless::Validators::string({ oneline => 1 }),
+  boolean => Ixless::Validators::boolean(),
+  idstr   => Ixless::Validators::idstr(),
 );
 
 =method ix_finalize
@@ -478,7 +478,7 @@ sub ix_finalize ($class) {
 
 =head1 HOOK METHODS
 
-L<Ix::DBIC::ResultSet> calls out to many methods defined in the rclass during
+L<Ixless::DBIC::ResultSet> calls out to many methods defined in the rclass during
 normal JMAP method handlers. This allows your rclasses to customize their
 handling in lots of ways, without needing to subclass the ResultSet class
 itself. They come in several varieties:
@@ -488,7 +488,7 @@ itself. They come in several varieties:
 = check methods (C<ix_FOO_check>)
 
 These are called I<before> the corresponding operation. If they return a value,
-that value must be an L<Ix::Error> object (probably, generated via
+that value must be an L<Ixless::Error> object (probably, generated via
 C<< $ctx->error >>). This is especially useful for doing authorization checks.
 
 = error methods (C<ix_FOO_error>)
@@ -624,7 +624,7 @@ For example:
 
     package MyApp::Schema::Result::Cookie;
     use base qw/DBIx::Class::Core/;
-    __PACKAGE__->load_components(qw/+Ix::DBIC::Result/);
+    __PACKAGE__->load_components(qw/+Ixless::DBIC::Result/);
 
     # register 'Cookie/bake' as a publicly accessible JMAP method, implemented
     # by the method cookie_bake
@@ -667,7 +667,7 @@ C<search> argument. If you don't provide C<cond_builder> (as we do here with
 
 Finally, you can provide a C<differ> key that controls the way elements are
 compared in ix_query_changes. If you don't provide one, C<differ()> from
-L<Ix::Util> is used. If you do provide one, it should be a coderef, which is
+L<Ixless::Util> is used. If you do provide one, it should be a coderef, which is
 passed the database entity and the relevant argument from the client-provided
 filter. It should return true if the two values differ (by some arbitrary
 definition), and false if they should be considered equivalent.
@@ -714,7 +714,7 @@ sub ix_update_state_string_field { 'modSeqChanged' }
 
 =method ix_state_string($state)
 
-This is passed the context's C<state> attribute (an L<Ix::AccountState> object),
+This is passed the context's C<state> attribute (an L<Ixless::AccountState> object),
 and returns the state string for this object type. You can override it if you
 don't want to use the default integer state strings.
 
@@ -808,8 +808,8 @@ sub ix_update_single_state_conds ($self, $example_row) {
 
 =method ix_compare_state($since, $state)
 
-Used internally by L<Ix::DBIC::ResultSet> to determine how to act for
-Foo/changes.  Returns an L<Ix::StateComparison> object.
+Used internally by L<Ixless::DBIC::ResultSet> to determine how to act for
+Foo/changes.  Returns an L<Ixless::StateComparison> object.
 
 =cut
 
@@ -817,25 +817,25 @@ sub ix_compare_state ($self, $since, $state) {
   my $high_ms = $state->highest_modseq_for($self->ix_type_key);
   my $low_ms  = $state->lowest_modseq_for($self->ix_type_key);
 
-  state $bad_state = Ix::Validators::state();
+  state $bad_state = Ixless::Validators::state();
 
   if ($bad_state->($since)) {
-    return Ix::StateComparison->bogus;
+    return Ixless::StateComparison->bogus;
   }
 
-  if ($high_ms  < $since) { return Ix::StateComparison->bogus;   }
-  if ($low_ms   > $since) { return Ix::StateComparison->resync;  }
-  if ($high_ms == $since) { return Ix::StateComparison->in_sync; }
+  if ($high_ms  < $since) { return Ixless::StateComparison->bogus;   }
+  if ($low_ms   > $since) { return Ixless::StateComparison->resync;  }
+  if ($high_ms == $since) { return Ixless::StateComparison->in_sync; }
 
-  return Ix::StateComparison->okay;
+  return Ixless::StateComparison->okay;
 }
 
 =method ix_create_base_state
 
 This method is called when you create a new account (i.e., an
-C<Ix::DBIC::Result> where C<ix_is_account_base> is true). After you create an
+C<Ixless::DBIC::Result> where C<ix_is_account_base> is true). After you create an
 account, you must call this method to insert the appropriate rows into the
-states table (so that it can be tracked by C<Ix::AccountState>.
+states table (so that it can be tracked by C<Ixless::AccountState>.
 
 =cut
 
