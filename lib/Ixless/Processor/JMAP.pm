@@ -34,29 +34,6 @@ This method is passed a JMAP method name (like 'Core/echo') and should return
 either undef or a coderef, which is later called with the parameters C<$self>, an
 C<Ixless::Context> object, and the method's arguments as a hashref.
 
-If your C<handler_for> method returns undef, the processor will look first for
-handlers in your C<Ixless::DBIC::Result> classes' C<ix_published_method_map>
-methods, and then for its standard JMAP handlers (/get, /set, /changes, and
-maybe /query and /queryChanges).
-
-Take, for example the following rclass:
-
-    package MyApp::Schema::Result::Cookie;
-    use base qw/DBIx::Class::Core/;
-    __PACKAGE__->load_components(qw/+Ixless::DBIC::Result/);
-
-    sub ix_query_enabled { 0 }
-
-    sub published_method_map {
-      return { 'Cookie/bake' => 'cookie_bake' };
-    }
-
-If your JMAP processor provides only a stub C<handler_for>, you will
-automatically get handlers for Cookie/bake (provided by the rclass itself),
-plus Cookie/get, Cookie/set, and Cookie/changes (provided by this role). If
-your rclass was C<ix_query_enabled>, you would also get Cookie/query and
-Cookie/queryChanges.
-
 You can provide a more extensive C<handler_for> inside your processor to enable
 JMAP methods I<not> implemented by C<Ixless::DBIC::Result> rclasses. This processor
 handles the methods 'Spline/reticulate' and 'Flux/capacitate' in addition to
@@ -83,71 +60,6 @@ all of the methods defined by its rclasses:
 =cut
 
 requires 'handler_for';
-
-around handler_for => sub ($orig, $self, $method, @rest) {
-  my $handler = $self->$orig($method, @rest);
-  return $handler if $handler;
-
-  my $h = $self->_dbic_handlers;
-  return $h->{$method} if exists $h->{$method};
-
-  return;
-};
-
-has _dbic_handlers => (
-  is   => 'ro',
-  lazy => 1,
-  init_arg => undef,
-  default => sub {
-    my ($self) = @_;
-
-    my %handler;
-
-    my $source_reg = $self->schema_class->source_registrations;
-    for my $moniker (keys %$source_reg) {
-      my $rclass = $source_reg->{$moniker}->result_class;
-      next unless $rclass->isa('Ixless::DBIC::Result');
-
-      if (
-        $rclass->can('ix_published_method_map')
-        &&
-        (my $method_map = $rclass->ix_published_method_map)
-      ) {
-        for (keys %$method_map) {
-          my $method = $method_map->{$_};
-          $handler{$_} = sub ($self, $ctx, $arg = {}) {
-            $rclass->$method($ctx, $arg);
-          };
-        }
-      }
-
-      my $key = $rclass->ix_type_key;
-
-      $handler{"$key/get"} = sub ($self, $ctx, $arg = {}) {
-        $ctx->schema->resultset($moniker)->ix_get($ctx, $arg);
-      };
-
-      $handler{"$key/changes"} = sub ($self, $ctx, $arg = {}) {
-        $ctx->schema->resultset($moniker)->ix_changes($ctx, $arg);
-      };
-
-      $handler{"$key/set"} = sub ($self, $ctx, $arg) {
-        $ctx->schema->resultset($moniker)->ix_set($ctx, $arg);
-      };
-
-      if ($rclass->ix_query_enabled) {
-        $handler{"$key/query"} = sub ($self, $ctx, $arg) {
-          $ctx->schema->resultset($moniker)->ix_query($ctx, $arg);
-        };
-        $handler{"$key/queryChanges"} = sub ($self, $ctx, $arg) {
-          $ctx->schema->resultset($moniker)->ix_query_changes($ctx, $arg);
-        };
-      }
-    }
-
-    return \%handler;
-  }
-);
 
 sub _sanity_check_calls ($self, $calls, $arg) {
   # We should, in the future, add a bunch of error checking up front and reject

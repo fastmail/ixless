@@ -55,25 +55,6 @@ from some descendant context.
 
 sub root_context ($self) { $self }
 
-=attr schema
-
-A handle to an C<Ixless::DBIC::Schema> object. This is the normal way of accessing
-the database from inside your application.
-
-=method global_rs
-
-=method global_rs_including_inactive
-
-These are delegates to the methods of the same name in C<< $self->schema >>.
-
-=cut
-
-has schema => (
-  is   => 'ro',
-  required => 1,
-  handles  => [ qw( global_rs global_rs_including_inactive ) ],
-);
-
 =attr processor
 
 An C<Ixless::Processor> that's used to C<handle_calls> made on this context.

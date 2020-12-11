@@ -131,9 +131,6 @@ returns the response from the processor.
 =cut
 
 sub to_app ($self) {
-  my %schema_cache;
-  push $self->_caches->@*, \%schema_cache;
-
   my $app = sub ($env) {
     my $req = Plack::Request->new($env);
 
@@ -155,13 +152,7 @@ sub to_app ($self) {
 
     my $ctx;
     my $res = try {
-      unless ($schema_cache{$$}) {
-        %schema_cache = ($$ => $self->processor->schema_connection);
-      }
-
-      $ctx = $self->processor->context_from_plack_request($req, {
-        schema => $schema_cache{$$},
-      });
+      $ctx = $self->processor->context_from_plack_request($req, {});
       Carp::confess("could not establish context")
         unless $ctx && $ctx->does('Ixless::Context');
       $self->_core_request($ctx, $req);

@@ -44,7 +44,6 @@ has root_context => (
   does   => 'Ixless::Context',
   required => 1,
   handles  => [ qw(
-    schema
     processor
     global_rs
     global_rs_including_inactive
@@ -120,6 +119,8 @@ to a nested ix_set).
 =cut
 
 sub txn_do ($self, $code) {
+  Carp::confess("txn_do is nonsensical without a schema!");
+
   return $self->schema->txn_do(sub {
     if (
          $self->_txn_level == 0
@@ -181,39 +182,6 @@ sub txn_do ($self, $code) {
 
 sub process_request ($self, $calls) {
   $self->processor->process_request($self, $calls);
-}
-
-=method account_rs($rs_name)
-
-Just like C<< $self->schema->resultset($rs_name) >>, but ensures that the
-resultset only contains active rows matching our accountId. See also
-L<Ixless::DBIC::AccountResult>.
-
-=cut
-
-sub account_rs ($self, $rs_name) {
-  my $rs = $self->schema->resultset($rs_name)->search({
-    'me.accountId' => $self->accountId,
-  });
-
-  if ($rs->result_class->isa('Ixless::DBIC::Result')) {
-    $rs = $rs->search({ 'me.isActive' => 1 });
-  }
-
-  return $rs;
-}
-
-=method account_rs_including_inactive($rs_name)
-
-Just like C<account_rs>, but without the C<isActive> constraint.  See also
-L<Ixless::DBIC::AccountResult>.
-
-=cut
-
-sub account_rs_including_inactive ($self, $rs_name) {
-  $self->schema->resultset($rs_name)->search({
-    'me.accountId' => $self->accountId,
-  });
 }
 
 =method with_account($account_type, $accountId)
