@@ -15,6 +15,7 @@ use Plack::Builder;
 use IO::Handle;
 use Time::HiRes qw(gettimeofday tv_interval);
 use Plack::Middleware::ReverseProxy;
+use Ixless::Util;
 
 use namespace::autoclean;
 
