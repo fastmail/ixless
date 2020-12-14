@@ -7,7 +7,6 @@ use lib 't/lib';
 
 use Bakesale;
 use Bakesale::App;
-use Bakesale::Schema;
 use Capture::Tiny qw(capture_stderr);
 use JSON::MaybeXS qw(decode_json);
 use Test::Deep;
@@ -15,9 +14,9 @@ use Test::Deep::JType;
 use Test::More;
 
 my ($app, $jmap_tester) = Bakesale::Test->new_test_app_and_tester;
-\my %account = Bakesale::Test->load_trivial_account($app->processor->schema_connection);
+\my %account = Bakesale::Test->load_trivial_account();
 
-$jmap_tester->_set_cookie('bakesaleUserId', $account{users}{rjbs});
+$jmap_tester->_set_cookie('bakesaleUserId', 42);
 
 my $log_data;
 open(my $log_fh, '>', \$log_data);
@@ -64,14 +63,7 @@ local @ENV{qw(NO_CAKE_TOPPERS QUIET_BAKESALE)} = (1, 1);
 
 capture_stderr(sub {
   $res = $jmap_tester->request([
-    [
-      'Cake/set' => {
-        create => {
-          yum => { type => 'wedding', layer_count => 4, recipeId => $account{recipes}{1} },
-          woo => { type => 'wedding', layer_count => 8, recipeId => $account{recipes}{1} },
-        }
-      }, "my id"
-    ],
+    [ countChars => { string => 'clarinet' }, 'a'],
     [
       'Cake/frobnicate' => {}, 'x'
     ],
@@ -82,12 +74,10 @@ cmp_deeply(
   $res->as_stripped_triples,
   [
     [
-      'Cake/set' => superhashof({
-        notCreated => {
-          woo => { guid => ignore(), type => 'internalError' },
-          yum => { guid => ignore(), type => 'internalError' },
-        },
-      }), 'my id'
+      'charCount' => {
+        string => 'clarinet',
+        length => 8,
+      }, 'a',
     ],
     [
       error => {
@@ -121,7 +111,7 @@ for my $line (@lines) {
       ) : (
         call_info => [
           [
-            'Cake/set' => { elapsed_seconds => $elapsed_re, was_known_call => 1 },
+            'countChars' => { elapsed_seconds => $elapsed_re, was_known_call => 1 },
           ],
           [
             'Cake/frobnicate' => {
@@ -130,7 +120,6 @@ for my $line (@lines) {
             },
           ],
         ],
-        exception_guids => [ re('[A-Z0-9-]+'), re('[A-Z0-9-]+') ],
       )
     },
     "log line looks right"
@@ -159,7 +148,7 @@ for my $line (@lines) {
     api_uri => "http://bakesale.local:65534/jmap",
   });
 
-  $jmap_tester->_set_cookie('bakesaleUserId', $account{users}{rjbs});
+  $jmap_tester->_set_cookie('bakesaleUserId', 42);
 
   # Our real request ip!
   $jmap_tester->ua->default_header('X-Forwarded-For' => '1.2.3.4');
