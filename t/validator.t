@@ -7,7 +7,7 @@ BEGIN { binmode $_, ':encoding(UTF-8)' for *STDOUT, *STDERR };
 
 use lib 't/lib';
 
-use Ixless::Validators qw(domain email idstr string);
+use Ixless::Validators qw(domain email idstr string maybe);
 use Test::More;
 use Ixless::Util qw(ix_new_id);
 
@@ -34,6 +34,14 @@ subtest "email validator" => sub {
   my $emailerr = email();
   ok( $emailerr->('yourface@myface.ix.'), "trailing dots no good in email");
 };
+
+subtest "maybe-email validator" => sub {
+  my $maybe = maybe(email());
+  ok(! $maybe->(undef), 'undef is valid');
+  ok(! $maybe->('foo@bar.com'), 'valid email is valid');
+  ok($maybe->('banana'), 'invalid email is invalid');
+};
+
 
 my @tests = (
   {

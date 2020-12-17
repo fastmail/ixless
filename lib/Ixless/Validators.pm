@@ -14,6 +14,7 @@ use Sub::Exporter -setup => [ qw(
   array_of
   enum
   record
+  maybe
 
   boolean
   integer
@@ -153,6 +154,20 @@ sub array_of ($validator) {
 
     # Sort of pathetic. -- rjbs, 2017-05-10
     return "invalid values in array";
+  };
+}
+
+=func maybe($validator)
+
+The given value must be either undef, for validate with the given other
+validator.
+
+=cut
+
+sub maybe ($validator) {
+  return sub ($x, @) {
+    return unless defined $x;
+    return $validator->($x);
   };
 }
 
