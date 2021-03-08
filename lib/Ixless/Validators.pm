@@ -4,7 +4,7 @@ package Ixless::Validators;
 # ABSTRACT: validate your input
 
 use JSON::MaybeXS ();
-use Params::Util qw(_ARRAY0);
+use Params::Util qw(_ARRAY0 _HASH0);
 use Safe::Isa;
 use Ixless::Util qw($ix_id_re);
 
@@ -12,6 +12,7 @@ use experimental qw(lexical_subs postderef signatures);
 
 use Sub::Exporter -setup => [ qw(
   array_of
+  hash_of
   enum
   record
   maybe
@@ -154,6 +155,28 @@ sub array_of ($validator) {
 
     # Sort of pathetic. -- rjbs, 2017-05-10
     return "invalid values in array";
+  };
+}
+
+=func hash_of($validator)
+
+The given value must be a hash where the keys don't matter but the values
+must be some kind of other validator. For the validator
+C<< my $val = hash_of(integer(-10, 10)) >>, for example,
+C<{ x => 1, y => 2, z => -2}> is valid, but C<5> and
+C<{ x => "cat" }> are not.
+
+=cut
+
+sub hash_of ($validator) {
+  return sub ($x, @) {
+    return "value is not a hash" unless _HASH0($x);
+
+    my @errors = grep {; defined } map {; $validator->($_) } values %$x;
+    return unless @errors;
+
+    # Sort of pathetic. -- rjbs, 2017-05-10
+    return "invalid values in hash";
   };
 }
 
