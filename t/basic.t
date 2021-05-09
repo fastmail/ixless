@@ -13,7 +13,7 @@ use Test::Deep;
 use Test::Deep::JType;
 use Test::More;
 use Unicode::Normalize;
-use Ixless::Util qw(ix_new_id);
+use Ix::Util qw(ix_new_id);
 
 sub mkref ($result_of, $name, $path) {
   return { resultOf => $result_of, name => $name, path => $path }

@@ -1,5 +1,5 @@
 use v5.24.0;
-package Ixless::JMAP::SentenceCollection;
+package Ix::JMAP::SentenceCollection;
 # ABSTRACT: an easy way to build up results
 
 use Moose;
@@ -16,13 +16,13 @@ returning it.
 
 =attr sentence_broker
 
-The L<Ixless::JMAP::SentenceBroker> associate with the collection.
+The L<Ix::JMAP::SentenceBroker> associate with the collection.
 
 =cut
 
-use Ixless::JMAP::SentenceBroker;
+use Ix::JMAP::SentenceBroker;
 sub sentence_broker {
-  state $BROKER = Ixless::JMAP::SentenceBroker->new;
+  state $BROKER = Ix::JMAP::SentenceBroker->new;
 }
 
 # [ [ $result, $cid ], ... ]
@@ -43,12 +43,12 @@ sub results ($self) {
 
 =method has_errors
 
-Returns 1 if any of the results in the collection is an L<Ixless::Error>.
+Returns 1 if any of the results in the collection is an L<Ix::Error>.
 
 =cut
 
 sub has_errors {
-  ($_->[0]->does('Ixless::Error') && return 1) for $_[0]->_result_client_id_pairs;
+  ($_->[0]->does('Ix::Error') && return 1) for $_[0]->_result_client_id_pairs;
   return;
 }
 

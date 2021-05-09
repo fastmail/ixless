@@ -1,5 +1,5 @@
 use 5.20.0;
-package Ixless::Processor;
+package Ix::Processor;
 # ABSTRACT: do stuff with requests
 
 use Moose::Role;
@@ -14,7 +14,7 @@ use namespace::autoclean;
 =head1 OVERVIEW
 
 This is a Moose role for building processors (the central component of
-L<Ixless::App>s). An C<Ixless::Processor> requires four methods:
+L<Ix::App>s). An C<Ix::Processor> requires four methods:
 
 =for :list
 * file_exception_report($ctx, $exception)
@@ -28,7 +28,7 @@ requires 'context_from_plack_request';
 
 =attr behind_proxy
 
-If true, Ixless::App will wrap itself in L<Plack::Middleware::ReverseProxy>.
+If true, Ix::App will wrap itself in L<Plack::Middleware::ReverseProxy>.
 
 =cut
 

@@ -1,14 +1,14 @@
 use 5.20.0;
-package Ixless::Context::WithAccount;
-# ABSTRACT: an Ixless::Context, bound to a single account
+package Ix::Context::WithAccount;
+# ABSTRACT: an Ix::Context, bound to a single account
 
 use Moose::Role;
 use experimental qw(signatures postderef);
 
-use Ixless::Error;
-use Ixless::Result;
+use Ix::Error;
+use Ix::Result;
 
-use Ixless::AccountState;
+use Ix::AccountState;
 
 use Try::Tiny;
 
@@ -16,10 +16,10 @@ use namespace::autoclean;
 
 =head1 OVERVIEW
 
-This is a Moose role representing an L<Ixless::Context> object that's bound to a
+This is a Moose role representing an L<Ix::Context> object that's bound to a
 single account. Most operations in Ix are done on a single account, and thus
 done with a C<WithAccount> context object. When a request comes in to an
-C<Ixless::App>, we build a context for a given accountId, and then all of the
+C<Ix::App>, we build a context for a given accountId, and then all of the
 methods are bound to that context. In addition to access control, a
 WithAccount context handles record-keeping of modseqs and state strings for an
 account.
@@ -41,7 +41,7 @@ requires 'accountId';
 
 has root_context => (
   is     => 'ro',
-  does   => 'Ixless::Context',
+  does   => 'Ix::Context',
   required => 1,
   handles  => [ qw(
     processor
@@ -74,20 +74,20 @@ has _txn_level => (
 
 =attr state
 
-An L<Ixless::AccountState> object.
+An L<Ix::AccountState> object.
 
 =cut
 
 has state => (
   is => 'rw',
-  isa => 'Ixless::AccountState',
+  isa => 'Ix::AccountState',
   lazy => 1,
   builder => '_build_state',
   predicate => '_has_state',
 );
 
 sub _build_state ($self) {
-  Ixless::AccountState->new({
+  Ix::AccountState->new({
     context      => $self,
     account_type => $self->account_type,
     accountId    => $self->accountId,
@@ -205,7 +205,7 @@ sub with_account ($self, $account_type, $accountId) {
 
 =method result($type, $properties = {})
 
-A convenience method for generating an L<Ixless::Result::Generic>. If
+A convenience method for generating an L<Ix::Result::Generic>. If
 C<$properties> contains an C<accountId> that does not match our own, generates
 an internal error. All results will include our accountId.
 

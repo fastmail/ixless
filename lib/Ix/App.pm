@@ -1,5 +1,5 @@
 use 5.20.0;
-package Ixless::App;
+package Ix::App;
 # ABSTRACT: stand up a PSGI application to handle requests from the world
 
 use Moose::Role;
@@ -15,7 +15,7 @@ use Plack::Builder;
 use IO::Handle;
 use Time::HiRes qw(gettimeofday tv_interval);
 use Plack::Middleware::ReverseProxy;
-use Ixless::Util;
+use Ix::Util;
 
 use namespace::autoclean;
 
@@ -23,14 +23,14 @@ use namespace::autoclean;
 
 Here's a tiny script suitable for running with L<plackup>.
 
-    package MyApp::App { with 'Ixless::App' }
+    package MyApp::App { with 'Ix::App' }
     MyApp::App->new->to_app;
 
 =head1 OVERVIEW
 
-Ixless::App is a Moose role for building PSGI applications. It receives requests,
-creates L<Ixless::Context> objects from them, and then passes them off to the
-L<Ixless::Processor> to handle them. It also handles a bunch of other low-level
+Ix::App is a Moose role for building PSGI applications. It receives requests,
+creates L<Ix::Context> objects from them, and then passes them off to the
+L<Ix::Processor> to handle them. It also handles a bunch of other low-level
 things like logging, basic error handling, etc.
 
 =attr json_codec
@@ -73,7 +73,7 @@ has logger_json_codec => (
 
 =attr processor (required)
 
-An L<Ixless::Processor>...the most important part of any Ixless::App!
+An L<Ix::Processor>...the most important part of any Ix::App!
 
 =cut
 
@@ -121,7 +121,7 @@ has _caches => (
 
 =method to_app
 
-This is the most important method on an Ixless::App; it returns a PSGI application
+This is the most important method on an Ix::App; it returns a PSGI application
 (i.e., a coderef). It takes the environment, adds some information to it (an
 C<ix.transaction> key), calls C<context_from_plack_request> on the processor,
 caches the schema, then passes it off to C<_core_request> to do the actual
@@ -146,7 +146,7 @@ sub to_app ($self) {
     $transaction_number++;
     $req->env->{'ix.transaction'} = {
       guid  => $guid,
-      time  => Ixless::DateTime->now,
+      time  => Ix::DateTime->now,
       htime => [ gettimeofday ],
       seq   => $transaction_number,
     };
@@ -155,7 +155,7 @@ sub to_app ($self) {
     my $res = try {
       $ctx = $self->processor->context_from_plack_request($req, {});
       Carp::confess("could not establish context")
-        unless $ctx && $ctx->does('Ixless::Context');
+        unless $ctx && $ctx->does('Ix::Context');
       $self->_core_request($ctx, $req);
     } catch {
       my $error = $_;

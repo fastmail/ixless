@@ -54,7 +54,7 @@ package Bakesale::Context {;
     return 1;
   }
 
-  with 'Ixless::Context';
+  with 'Ix::Context';
 }
 
 package Bakesale::Context::System {
@@ -73,7 +73,7 @@ package Bakesale::Context::System {
 
   sub is_system { 1 }
 
-  with 'Ixless::Context';
+  with 'Ix::Context';
 }
 
 package Bakesale::Context::WithAccount {
@@ -85,7 +85,7 @@ package Bakesale::Context::WithAccount {
   sub account_type { 'generic' }
   has accountId => (is => 'ro', isa => 'Str', required => 1);
 
-  with 'Ixless::Context::WithAccount';
+  with 'Ix::Context::WithAccount';
 }
 
 1;

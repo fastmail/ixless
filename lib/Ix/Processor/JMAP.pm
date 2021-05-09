@@ -1,5 +1,5 @@
 use 5.20.0;
-package Ixless::Processor::JMAP;
+package Ix::Processor::JMAP;
 # ABSTRACT: do stuff with JMAP requests
 
 use Moose::Role;
@@ -13,16 +13,16 @@ use Time::HiRes qw(gettimeofday tv_interval);
 
 use namespace::autoclean;
 
-use Ixless::JMAP::SentenceCollection;
+use Ix::JMAP::SentenceCollection;
 
-with 'Ixless::Processor';
+with 'Ix::Processor';
 
 =head1 OVERVIEW
 
 This is a Moose role designed to make JMAP processors (the kind of processor
-used by an L<Ixless::App::JMAP>) easy to write. It automatically adds method
+used by an L<Ix::App::JMAP>) easy to write. It automatically adds method
 handlers for the standard JMAP methods (/get, /set, /changes, and maybe /query
-and /queryChanges) which are built from your L<Ixless::DBIC::Result> classes. See
+and /queryChanges) which are built from your L<Ix::DBIC::Result> classes. See
 the documentation there for more details.
 
 =cut
@@ -32,16 +32,16 @@ the documentation there for more details.
 Implementations are required to provide this method, but it can be a stub.
 This method is passed a JMAP method name (like 'Core/echo') and should return
 either undef or a coderef, which is later called with the parameters C<$self>, an
-C<Ixless::Context> object, and the method's arguments as a hashref.
+C<Ix::Context> object, and the method's arguments as a hashref.
 
 You can provide a more extensive C<handler_for> inside your processor to enable
-JMAP methods I<not> implemented by C<Ixless::DBIC::Result> rclasses. This processor
+JMAP methods I<not> implemented by C<Ix::DBIC::Result> rclasses. This processor
 handles the methods 'Spline/reticulate' and 'Flux/capacitate' in addition to
 all of the methods defined by its rclasses:
 
     package MyApp::JMAP::Processor;
     use Moose;
-    with 'Ixless::Processor::JMAP';
+    with 'Ix::Processor::JMAP';
 
     my %other_handlers = (
       'Spline/reticulate' => sub ($self, $ctx, $arg) {
@@ -101,7 +101,7 @@ sub expand_backrefs ($self, $ctx, $arg, $meta_arg = {}) {
   my %skip_cid = map {; $_ => 1 } ($meta_arg->{skip_cids} // [])->@*;
 
   my sub throw_ref_error ($desc) {
-    Ixless::Error::Generic->new({
+    Ix::Error::Generic->new({
       error_type  => 'resultReference',
       properties  => {
         description => $desc,
@@ -144,7 +144,7 @@ sub expand_backrefs ($self, $ctx, $arg, $meta_arg = {}) {
       );
     }
 
-    my ($result, $error) = Ixless::Util::resolve_modified_jpointer(
+    my ($result, $error) = Ix::Util::resolve_modified_jpointer(
       $ref->{path},
       $sentence->arguments,
     );
@@ -165,8 +165,8 @@ This is the where the main work of the processor happens. It checks the
 arguments for well-formedness, calls C<optimize_calls>, then begins
 processing. To do so, it walks the list of C<$calls>, calling C<handler_for>
 to get each method name, expands backrefs as necessary, then calls the handler
-to process each call individually.  The handlers return L<Ixless::Result> objects,
-which are accumulated by an C<Ixless::JMAP::SentenceCollection> object. When all
+to process each call individually.  The handlers return L<Ix::Result> objects,
+which are accumulated by an C<Ix::JMAP::SentenceCollection> object. When all
 of the calls have been processed, this checks for and reports any errors, then
 returns the sentence collection.
 
@@ -182,19 +182,19 @@ sub handle_calls ($self, $ctx, $calls, $arg = {}) {
   my $call_start;
   my $was_known_call;
 
-  my $sc = Ixless::JMAP::SentenceCollection->new;
+  my $sc = Ix::JMAP::SentenceCollection->new;
   local $ctx->root_context->{result_accumulator} = $sc;
 
   CALL: for my $call (@$calls) {
     $call_start = [ gettimeofday ];
     $was_known_call = 1;
 
-    if ($call->$_DOES('Ixless::Multicall')) {
+    if ($call->$_DOES('Ix::Multicall')) {
       # Returns [ [ $item, $cid ], ... ]
       my $pairs = $call->execute($ctx);
 
-      Carp::confess("non-Ixless::Result in result list")
-        if grep {; ! $_->[0]->$_DOES('Ixless::Result') } @$pairs;
+      Carp::confess("non-Ix::Result in result list")
+        if grep {; ! $_->[0]->$_DOES('Ix::Result') } @$pairs;
 
       $sc->add_items($pairs);
 
@@ -211,7 +211,7 @@ sub handle_calls ($self, $ctx, $calls, $arg = {}) {
       $was_known_call = 0;
       $sc->add_items([
         [
-          Ixless::Error::Generic->new({ error_type  => 'unknownMethod' }),
+          Ix::Error::Generic->new({ error_type  => 'unknownMethod' }),
           $cid,
         ],
       ]);
@@ -230,7 +230,7 @@ sub handle_calls ($self, $ctx, $calls, $arg = {}) {
 
       $self->$handler($ctx, $arg);
     } catch {
-      if ($_->$_DOES('Ixless::Error')) {
+      if ($_->$_DOES('Ix::Error')) {
         return $_;
       } else {
         warn $_;
@@ -241,12 +241,12 @@ sub handle_calls ($self, $ctx, $calls, $arg = {}) {
     RV: for my $i (0 .. $#rv) {
       my $item = $rv[$i];
 
-      Carp::confess("non-Ixless::Result in result list: $item")
-        unless $item->$_DOES('Ixless::Result');
+      Carp::confess("non-Ix::Result in result list: $item")
+        unless $item->$_DOES('Ix::Result');
 
       $sc->add_items([[ $item, $cid ]]);
 
-      if ($item->does('Ixless::Error') && $i < $#rv) {
+      if ($item->does('Ix::Error') && $i < $#rv) {
         # In this branch, we have a potential return value like:
         # (
         #   [ valid => ... ],
@@ -267,7 +267,7 @@ sub handle_calls ($self, $ctx, $calls, $arg = {}) {
 
     # XXX - We still want to record call info for multicalls!
     #       -- alh, 2019-06-26
-    my $ident = $call->$_DOES('Ixless::Multicall')
+    my $ident = $call->$_DOES('Ix::Multicall')
               ? $call->call_ident
               : $call->[0];
 

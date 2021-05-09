@@ -12,10 +12,10 @@ my %WriteMakefileArgs = (
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => "6.78"
   },
-  "DISTNAME" => "Ixless",
+  "DISTNAME" => "Ix",
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.024000",
-  "NAME" => "Ixless",
+  "NAME" => "Ix",
   "PREREQ_PM" => {
     "Carp" => 0,
     "Data::GUID" => 0,

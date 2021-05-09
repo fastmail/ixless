@@ -1,5 +1,5 @@
 use v5.24.0;
-package Ixless::JMAP::SentenceBroker;
+package Ix::JMAP::SentenceBroker;
 # ABSTRACT: an object to get some sentences
 
 use Moose;
@@ -15,8 +15,8 @@ use JSON::Typist;
 =head1 OVERVIEW
 
 This is an implementation of L<JMAP::Tester::Role::SentenceBroker>.
-It's used internally by L<Ixless::Processor::JMAP>, via
-L<Ixless::JMAP::SentenceCollection>.
+It's used internally by L<Ix::Processor::JMAP>, via
+L<Ix::JMAP::SentenceCollection>.
 
 =method client_ids_for_items($items)
 

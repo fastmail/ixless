@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Exception::Reporter::Summarizer::Ixless;
+package Exception::Reporter::Summarizer::Ix;
 # ABSTRACT: summarize Ix exceptions with L<Exception::Reporter>
 
 use parent 'Exception::Reporter::Summarizer';
@@ -8,9 +8,9 @@ use parent 'Exception::Reporter::Summarizer';
 =head1 OVERVIEW
 
 If added as a summarizer to an L<Exception::Reporter>, this plugin will
-summarize L<Ixless> exception wrappers. This should be the first
+summarize L<Ix> exception wrappers. This should be the first
 summarizer to be checked so that it can generate a proper error message,
-otherwise your error reports may simply say C<Ixless::ExceptionWrapper=HASH...>.
+otherwise your error reports may simply say C<Ix::ExceptionWrapper=HASH...>.
 
 =cut
 
@@ -26,7 +26,7 @@ sub new {
 sub can_summarize {
   my ($self, $entry) = @_;
   return try {
-    $entry->[1]->isa('Ixless::ExceptionWrapper');
+    $entry->[1]->isa('Ix::ExceptionWrapper');
   };
 }
 
