@@ -22,6 +22,28 @@ out. Easy peasy.
 =cut
 
 sub _core_request ($self, $ctx, $req) {
+  unless ($req->method eq 'POST') {
+    return [
+      405,
+      [
+        'Content-Type' => 'application/json; charset=utf-8',
+        'Allow'        => 'POST',
+      ],
+      [ '{"error":"Method not allowed"}' ],
+    ];
+  }
+
+  # Must be json. Helps block silly HTML Form POST CSRFs
+  if (($req->header('Content-Type') // '') !~ /^application\/json/i) {
+    return [
+      415,
+      [
+        'Content-Type' => 'application/json; charset=utf-8',
+      ],
+      [ '{"error":"Invalid content-type, must be application/json or application/json;charset=utf-8"}' ],
+    ];
+  }
+
   my $payload = try { $self->decode_json( $req->raw_body ); };
 
   unless ($payload) {
