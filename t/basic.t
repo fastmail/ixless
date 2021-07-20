@@ -387,6 +387,57 @@ subtest "multicalls" => sub {
   );
 };
 
+subtest 'request validation' => sub {
+  my $uri = $jmap_tester->api_uri;
+
+  subtest "must be post" => sub {
+    my $res = $jmap_tester->ua->get($uri, Content => "{}");
+
+    is($res->code, 405, 'got a 405 response');
+    jcmp_deeply(
+      decode_json($res->decoded_content),
+      { error => "Method not allowed" },
+      'got correct error',
+    );
+  };
+
+  subtest "must be application/json" => sub {
+    my $res = $jmap_tester->ua->post(
+      $uri,
+      'Content-Type' => "junk",
+      Content        => "{}"
+    );
+
+    is($res->code, 415, 'got a 415 response');
+    jcmp_deeply(
+      decode_json($res->decoded_content),
+      { error => "Invalid content-type, must be application/json or application/json;charset=utf-8" },
+      'got correct error',
+    );
+  };
+
+  subtest "other params on application/json okay" => sub {
+    for my $ct (
+      "application/json",
+      "application/json;charset=utf-8",
+      "application/json;what=the"
+    ) {
+      my $res = $jmap_tester->ua->post(
+        $uri,
+        'Content-Type' => $ct,
+        Content => '{ "methodCalls" : [] }',
+      );
+
+      is($res->code, 200, 'got a good response');
+      jcmp_deeply(
+        decode_json($res->decoded_content),
+        { methodResponses => [] },
+        'got expected response',
+      );
+    }
+  };
+};
+
 $app->_shutdown;
 
 done_testing;
