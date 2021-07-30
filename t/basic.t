@@ -26,7 +26,11 @@ my ($app, $jmap_tester) = Bakesale::Test->new_test_app_and_tester;
 
 my $accountId = $account{accounts}{rjbs};
 
-$jmap_tester->_set_cookie('bakesaleUserId', 42);
+$jmap_tester->ua->set_cookie({
+  api_uri => $jmap_tester->api_uri,
+  name    => 'bakesaleUserId',
+  value   => 42,
+});
 
 {
   $app->clear_transaction_log;
@@ -123,7 +127,11 @@ subtest "additional request handling" => sub {
 
   my $uri = $jmap_tester->api_uri;
   $uri =~ s/jmap$/secret/;
-  my $res = $jmap_tester->ua->get($uri);
+  my $res = $jmap_tester->ua->request(
+    $jmap_tester,
+    HTTP::Request->new(GET => $uri),
+    'jmap',
+  )->get;
   is(
     $res->content,
     "Your secret is safe with me.\n",
@@ -141,7 +149,7 @@ subtest "additional request handling" => sub {
 };
 
 subtest "good call gets headers" => sub {
-  $jmap_tester->ua->default_header('Origin' => 'example.net');
+  $jmap_tester->ua->lwp->default_header('Origin' => 'example.net');
 
   my $res = $jmap_tester->request([
     [ 'countChars' => { string => 'hello I am a string' } ],
@@ -344,7 +352,13 @@ subtest "exeptions are not thrown twice" => sub {
 
   $app->processor->clear_exceptions;
 
-  my (undef, $res) = capture_stderr(sub { $jmap_tester->ua->get($uri) });
+  my (undef, $res) = capture_stderr(sub {
+    $jmap_tester->ua->request(
+      $jmap_tester,
+      HTTP::Request->new(GET => $uri),
+      'jmap',
+    )->get;
+  });
   like(
     $res->content,
     qr/"error":"internal"/,
@@ -391,7 +405,11 @@ subtest 'request validation' => sub {
   my $uri = $jmap_tester->api_uri;
 
   subtest "must be post" => sub {
-    my $res = $jmap_tester->ua->get($uri, Content => "{}");
+    my $res = $jmap_tester->ua->request(
+      $jmap_tester,
+      HTTP::Request->new(GET => $uri, [], "{}"),
+      'jmap',
+    )->get;
 
     is($res->code, 405, 'got a 405 response');
     jcmp_deeply(
@@ -402,11 +420,15 @@ subtest 'request validation' => sub {
   };
 
   subtest "must be application/json" => sub {
-    my $res = $jmap_tester->ua->post(
-      $uri,
-      'Content-Type' => "junk",
-      Content        => "{}"
-    );
+    my $res = $jmap_tester->ua->request(
+      $jmap_tester,
+      HTTP::Request->new(
+        POST => $uri,
+        [ "Content-Type" => "junk" ],
+        "{}",
+      ),
+      'jmap',
+    )->get;
 
     is($res->code, 415, 'got a 415 response');
     jcmp_deeply(
@@ -422,11 +444,15 @@ subtest 'request validation' => sub {
       "application/json;charset=utf-8",
       "application/json;what=the"
     ) {
-      my $res = $jmap_tester->ua->post(
-        $uri,
-        'Content-Type' => $ct,
-        Content => '{ "methodCalls" : [] }',
-      );
+      my $res = $jmap_tester->ua->request(
+        $jmap_tester,
+        HTTP::Request->new(
+          POST => $uri,
+          [ "Content-Type" => $ct, ],
+          '{ "methodCalls" : [] }',
+        ),
+        'jmap',
+      )->get;
 
       is($res->code, 200, 'got a good response');
       jcmp_deeply(

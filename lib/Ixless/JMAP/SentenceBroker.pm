@@ -63,13 +63,13 @@ sub paragraph_for_items {
   });
 }
 
-=method abort_callback
+=method abort
 
 This method will die if called.
 
 =cut
 
-sub abort_callback       { sub { ... } };
+sub abort { sub { ... } };
 
 =method strip_json_types
 
